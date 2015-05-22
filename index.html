@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Ciao Hello World!</title>
+<script>
+var DHT = require('bittorrent-dht')
+
+var dht = new DHT({ bootstrap: false })
+dht.listen(3000, function () {
+  console.log('now listening on 3000 as bootstrap')
+})
+
+dht.on('ready', function() {
+  // DHT is ready to use (i.e. the routing table contains at least K nodes, discovered
+  // via the bootstrap nodes)
+
+})
+
+window.onload = function() {
+  var getInput = document.querySelectorAll('.get')[0];
+  var getSubmit = document.querySelectorAll('.get-submit')[0]; 
+  getSubmit.onclick = function() {
+    var val = new Buffer(getInput.value, 'hex')
+
+    dht.get(val, function(err, res) {
+      if(err) return console.error(err)
+      document.querySelectorAll('.get-output')[0].innerHTML = res.v.toString()
+    })
+  }
+
+  var putSubmit = document.querySelectorAll('.put-submit')[0]; 
+  putSubmit.onclick = function() {
+    var putInput = document.querySelectorAll('.put')[0];
+    var val = new Buffer(putInput.value, 'utf-8')
+
+    dht.put({ v: val}, function(errors, hash) {
+      if(errors.length) return console.error(errors)
+      document.querySelectorAll('.put-output')[0].innerHTML = hash.toString('hex')
+    })
+  }
+}
+
+</script>
+<style>
+body {
+    font-family: verdana;
+    font-size: 12px;
+}
+</style>
+  </head>
+  <body>
+  GET: <input class="get" type="text" />
+  <input class="get-submit" type="submit" />
+
+  <br>
+  <textarea class="get-output"></textarea>
+  <br>
+  PUT: <input class="put" type="text" />
+  <input class="put-submit" type="submit" />
+  <br>
+  <textarea class="put-output"></textarea>
+  </body>
+</html>
